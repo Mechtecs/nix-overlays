@@ -30,7 +30,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  pname = "microsoft-edge-dev";
+  pname = "microsoft-edge-stable";
   version = "97.0.1072.55-1";
 
   src = fetchurl {
@@ -39,8 +39,8 @@ stdenv.mkDerivation rec {
   };
 
   unpackCmd = ''
-    mkdir -p microsoft-edge-dev-${version}
-    ${binutils-unwrapped}/bin/ar p $src data.tar.xz | ${xz}/bin/xz -dc | ${gnutar}/bin/tar -C microsoft-edge-dev-${version} -xf -
+    mkdir -p microsoft-edge-stable-${version}
+    ${binutils-unwrapped}/bin/ar p $src data.tar.xz | ${xz}/bin/xz -dc | ${gnutar}/bin/tar -C microsoft-edge-stable-${version} -xf -
   '';
 
   dontConfigure = true;
@@ -50,19 +50,19 @@ stdenv.mkDerivation rec {
     mkdir -p $out
     cp -R opt usr/bin usr/share $out
 
-    ln -sf $out/opt/microsoft/msedge-dev/microsoft-edge-dev $out/opt/microsoft/msedge-dev/microsoft-edge
-    ln -sf $out/opt/microsoft/msedge-dev/microsoft-edge-dev $out/bin/microsoft-edge-dev
+    ln -sf $out/opt/microsoft/msedge-dev/microsoft-edge-stable $out/opt/microsoft/msedge-dev/microsoft-edge
+    ln -sf $out/opt/microsoft/msedge-dev/microsoft-edge-stable $out/bin/microsoft-edge-stable
 
     rm -rf $out/share/doc
     rm -rf $out/opt/microsoft/msedge-dev/cron
 
-    substituteInPlace $out/share/applications/microsoft-edge-dev.desktop \
-      --replace /usr/bin/microsoft-edge-dev $out/bin/microsoft-edge-dev
+    substituteInPlace $out/share/applications/microsoft-edge-stable.desktop \
+      --replace /usr/bin/microsoft-edge-stable $out/bin/microsoft-edge-stable
 
-    substituteInPlace $out/share/gnome-control-center/default-apps/microsoft-edge-dev.xml \
+    substituteInPlace $out/share/gnome-control-center/default-apps/microsoft-edge-stable.xml \
       --replace /opt/microsoft/msedge-dev $out/opt/microsoft/msedge-dev
 
-    substituteInPlace $out/share/menu/microsoft-edge-dev.menu \
+    substituteInPlace $out/share/menu/microsoft-edge-stable.menu \
       --replace /opt/microsoft/msedge-dev $out/opt/microsoft/msedge-dev
 
     substituteInPlace $out/opt/microsoft/msedge-dev/xdg-mime \

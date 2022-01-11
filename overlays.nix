@@ -4,7 +4,7 @@
     final: prev:
 
       {
-        microsoft-edge-dev = prev.callPackage ./microsoft-edge-dev { };
+        microsoft-edge-stable = prev.callPackage ./microsoft-edge-stable { };
       }
   )
 ]

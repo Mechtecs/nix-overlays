@@ -21,7 +21,7 @@
       );
 
       derivations = [
-        "microsoft-edge-dev"
+        "microsoft-edge-stable"
       ];
 
       lib = nixpkgs.lib;
