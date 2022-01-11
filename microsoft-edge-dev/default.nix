@@ -31,11 +31,11 @@
 
 stdenv.mkDerivation rec {
   pname = "microsoft-edge-dev";
-  version = "90.0.782.0";
+  version = "97.0.1072.55-1";
 
   src = fetchurl {
-    url = "https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-dev/microsoft-edge-dev_${version}-1_amd64.deb";
-    hash = "sha256-eLJWQnPK/0iHNAfamlhQ1CM4XwRHpCGae27CDY6kqUQ=";
+    url = "https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_${version}_amd64.deb";
+    hash = "sha256-tRCleZziOn/1CXUJGBIKyWsr81AMfYEXLVe5luQcTuk=";
   };
 
   unpackCmd = ''
@@ -78,69 +78,98 @@ stdenv.mkDerivation rec {
       --replace "''${XDG_CONFIG_DIRS:-/etc/xdg}" "''${XDG_CONFIG_DIRS:-/run/current-system/sw/etc/xdg}"
   '';
 
-  preFixup = let
-    libPath = {
-      msedge = lib.makeLibraryPath [
-        glibc glib nss nspr atk at_spi2_atk xorg.libX11
-        xorg.libxcb cups.lib dbus_libs.lib expat libdrm
-        xorg.libXcomposite xorg.libXdamage xorg.libXext
-        xorg.libXfixes xorg.libXrandr libxkbcommon
-        gnome3.gtk gnome2.pango cairo gdk-pixbuf mesa
-        alsaLib at_spi2_core xorg.libxshmfence
-      ];
-      naclHelper = lib.makeLibraryPath [
-        glib
-      ];
-      libwidevinecdm = lib.makeLibraryPath [
-        glib nss nspr
-      ];
-      libGLESv2 = lib.makeLibraryPath [
-        xorg.libX11 xorg.libXext xorg.libxcb
-      ];
-      libsmartscreen = lib.makeLibraryPath [
-        libuuid stdenv.cc.cc.lib
-      ];
-    };
-  in ''
-    patchelf \
-      --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
-      --set-rpath "${libPath.msedge}" \
-      $out/opt/microsoft/msedge-dev/msedge
+  preFixup =
+    let
+      libPath = {
+        msedge = lib.makeLibraryPath [
+          glibc
+          glib
+          nss
+          nspr
+          atk
+          at_spi2_atk
+          xorg.libX11
+          xorg.libxcb
+          cups.lib
+          dbus_libs.lib
+          expat
+          libdrm
+          xorg.libXcomposite
+          xorg.libXdamage
+          xorg.libXext
+          xorg.libXfixes
+          xorg.libXrandr
+          libxkbcommon
+          gnome3.gtk
+          gnome2.pango
+          cairo
+          gdk-pixbuf
+          mesa
+          alsaLib
+          at_spi2_core
+          xorg.libxshmfence
+        ];
+        naclHelper = lib.makeLibraryPath [
+          glib
+        ];
+        libwidevinecdm = lib.makeLibraryPath [
+          glib
+          nss
+          nspr
+        ];
+        libGLESv2 = lib.makeLibraryPath [
+          xorg.libX11
+          xorg.libXext
+          xorg.libxcb
+        ];
+        libsmartscreen = lib.makeLibraryPath [
+          libuuid
+          stdenv.cc.cc.lib
+        ];
+      };
+    in
+    ''
+      patchelf \
+        --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
+        --set-rpath "${libPath.msedge}" \
+        $out/opt/microsoft/msedge-dev/msedge
 
-    patchelf \
-      --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
-      $out/opt/microsoft/msedge-dev/msedge-sandbox
+      patchelf \
+        --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
+        $out/opt/microsoft/msedge-dev/msedge-sandbox
 
-    patchelf \
-      --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
-      $out/opt/microsoft/msedge-dev/crashpad_handler
+      patchelf \
+        --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
+        $out/opt/microsoft/msedge-dev/crashpad_handler
 
-    patchelf \
-      --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
-      --set-rpath "${libPath.naclHelper}" \
-      $out/opt/microsoft/msedge-dev/nacl_helper
+      patchelf \
+        --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
+        --set-rpath "${libPath.naclHelper}" \
+        $out/opt/microsoft/msedge-dev/nacl_helper
 
-    patchelf \
-      --set-rpath "${libPath.libwidevinecdm}" \
-      $out/opt/microsoft/msedge-dev/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so
+      patchelf \
+        --set-rpath "${libPath.libwidevinecdm}" \
+        $out/opt/microsoft/msedge-dev/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so
 
-    patchelf \
-      --set-rpath "${libPath.libGLESv2}" \
-      $out/opt/microsoft/msedge-dev/libGLESv2.so
+      patchelf \
+        --set-rpath "${libPath.libGLESv2}" \
+        $out/opt/microsoft/msedge-dev/libGLESv2.so
 
-    patchelf \
-      --set-rpath "${libPath.libsmartscreen}" \
-      $out/opt/microsoft/msedge-dev/libsmartscreen.so
-  '';
+      patchelf \
+        --set-rpath "${libPath.libsmartscreen}" \
+        $out/opt/microsoft/msedge-dev/libsmartscreen.so
+    '';
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     homepage = "https://www.microsoftedgeinsider.com/en-us/";
     description = "Microsoft's fork of Chromium web browser";
     license = licenses.unfree;
     platforms = [ "x86_64-linux" ];
     maintainers = [
-      { name = "Azure Zanculmarktum";
-        email = "zanculmarktum@gmail.com"; }
+      {
+        name = "Azure Zanculmarktum";
+        email = "zanculmarktum@gmail.com";
+      }
     ];
   };
 }
